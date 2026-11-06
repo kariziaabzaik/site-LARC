@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel – LARC UFPE</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: {
+    colors: { ink:'#031a3d', navy:'#052865', steel:'#a4bdd3', accent:'#7fb0cc', chip:'#36677f' },
+    fontFamily: { display:['"Space Grotesk"','sans-serif'], sans:['"IBM Plex Sans"','sans-serif'] } } } }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<style>:focus-visible{outline:2px solid #7fb0cc;outline-offset:2px}</style>
+</head>
+<body class="bg-ink text-slate-200 font-sans antialiased min-h-screen">
+
+<header class="border-b border-steel/20 px-5 h-16 flex items-center justify-between">
+  <a href="index.html" class="font-display font-bold text-white">LARC UFPE · Painel</a>
+  <button id="sair" class="hidden text-sm border border-steel/40 px-3 py-1.5 rounded-md hover:bg-navy">Sair</button>
+</header>
+
+<main class="max-w-4xl mx-auto p-5">
+
+  <!-- LOGIN -->
+  <section id="login" class="max-w-sm mx-auto mt-16">
+    <h1 class="font-display font-bold text-2xl text-white">Entrar no painel</h1>
+    <form id="form-login" class="mt-6 space-y-4">
+      <div><label class="block text-sm mb-1" for="email">E-mail</label>
+        <input id="email" type="email" required class="w-full bg-navy border border-steel/30 rounded-md px-3 py-2"></div>
+      <div><label class="block text-sm mb-1" for="senha">Senha</label>
+        <input id="senha" type="password" required class="w-full bg-navy border border-steel/30 rounded-md px-3 py-2"></div>
+      <button class="w-full bg-white text-navy font-semibold py-2.5 rounded-md hover:bg-steel">Entrar</button>
+      <p id="erro" class="text-sm text-white" role="alert"></p>
+    </form>
+  </section>
+
+  <!-- PAINEL -->
+  <section id="painel" class="hidden">
+    <nav id="abas" class="flex flex-wrap gap-2" aria-label="Seções do site"></nav>
+    <h2 id="titulo" class="font-display font-bold text-2xl text-white mt-8"></h2>
+    <form id="form" class="mt-4 grid sm:grid-cols-2 gap-4 bg-navy border border-steel/20 rounded-xl p-5"></form>
+    <p id="status" class="mt-3 text-sm text-steel" role="status"></p>
+    <ul id="lista" class="mt-6 divide-y divide-steel/20 border border-steel/20 rounded-xl overflow-hidden"></ul>
+  </section>
+</main>
+
+<script>
+const cfg = window.LARC_CONFIG;
+const sb = supabase.createClient(cfg.url, cfg.anonKey);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// Esquema de cada seção: para criar um novo campo, basta adicionar uma linha aqui
+// (e a coluna correspondente no banco).
+const SCHEMA = {
+  projects:  { label:'Projetos',   title:'title', order:['created_at',false], fields:[
+    {k:'title', l:'Título', t:'text', req:1},
+    {k:'category', l:'Categoria', t:'select', o:{robotica:'Robótica', controle:'Controle', automacao:'Automação'}},
+    {k:'description', l:'Descrição', t:'textarea', full:1},
+    {k:'image_url', l:'Imagem', t:'file', accept:'image/*'}]},
+  events:    { label:'Eventos',    title:'title', order:['event_date',true], fields:[
+    {k:'title', l:'Título', t:'text', req:1},
+    {k:'event_date', l:'Data', t:'date', req:1},
+    {k:'location', l:'Horário e local', t:'text'},
+    {k:'is_deadline', l:'É um prazo (destaque)', t:'checkbox'}]},
+  documents: { label:'Documentos', title:'title', order:['created_at',false], fields:[
+    {k:'title', l:'Nome do documento', t:'text', req:1},
+    {k:'file_url', l:'Arquivo PDF', t:'file', accept:'application/pdf', req:1}]},
+  team:      { label:'Direção',    title:'name',  order:['position',true], fields:[
+    {k:'name', l:'Nome', t:'text', req:1},
+    {k:'role', l:'Cargo', t:'text'},
+    {k:'position', l:'Ordem de exibição (1 aparece primeiro)', t:'number'},
+    {k:'photo_url', l:'Foto', t:'file', accept:'image/*'}]}
+};
+let tab = 'projects', editing = null, rows = [];
+
+// ---------- Autenticação ----------
+function show(on) {
+  $('login').classList.toggle('hidden', on);
+  $('painel').classList.toggle('hidden', !on);
+  $('sair').classList.toggle('hidden', !on);
+  if (on) openTab(tab);
+}
+$('form-login').addEventListener('submit', async e => {
+  e.preventDefault();
+  const { error } = await sb.auth.signInWithPassword({ email: $('email').value, password: $('senha').value });
+  $('erro').textContent = error ? 'E-mail ou senha incorretos.' : '';
+  if (!error) show(true);
+});
+$('sair').addEventListener('click', async () => { await sb.auth.signOut(); show(false); });
+
+// ---------- Abas, formulário e lista ----------
+function openTab(t) {
+  tab = t; editing = null;
+  $('abas').innerHTML = Object.entries(SCHEMA).map(([k, s]) =>
+    `<button data-tab="${k}" class="px-4 py-1.5 rounded-full text-sm border ${k === t ? 'bg-white text-navy border-white' : 'border-steel/40'}">${s.label}</button>`).join('');
+  $('titulo').textContent = SCHEMA[t].label;
+  $('status').textContent = '';
+  renderForm(); loadList();
+}
+$('abas').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) openTab(b.dataset.tab); });
+
+const inputCls = 'w-full bg-ink border border-steel/30 rounded-md px-3 py-2';
+function renderForm() {
+  const v = editing || {};
+  $('form').innerHTML = SCHEMA[tab].fields.map(f => {
+    const wrap = f.full || f.t === 'textarea' ? 'sm:col-span-2' : '';
+    let el;
+    if (f.t === 'textarea') el = `<textarea name="${f.k}" rows="3" class="${inputCls}">${esc(v[f.k])}</textarea>`;
+    else if (f.t === 'select') el = `<select name="${f.k}" class="${inputCls}">${Object.entries(f.o).map(([k, n]) => `<option value="${k}" ${v[f.k] === k ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
+    else if (f.t === 'checkbox') return `<label class="flex items-center gap-2 text-sm ${wrap}"><input type="checkbox" name="${f.k}" ${v[f.k] ? 'checked' : ''}> ${f.l}</label>`;
+    else if (f.t === 'file') el = `<input type="file" name="${f.k}" accept="${f.accept}" class="${inputCls}" ${f.req && !v[f.k] ? 'required' : ''}>${v[f.k] ? '<p class="text-xs text-steel mt-1">Já existe um arquivo. Envie outro só se quiser trocar.</p>' : ''}`;
+    else el = `<input name="${f.k}" type="${f.t}" value="${esc(v[f.k])}" class="${inputCls}" ${f.req ? 'required' : ''}>`;
+    return `<div class="${wrap}"><label class="block text-sm mb-1">${f.l}</label>${el}</div>`;
+  }).join('') +
+  `<div class="sm:col-span-2 flex gap-3"><button class="bg-white text-navy font-semibold px-5 py-2 rounded-md hover:bg-steel">${editing ? 'Salvar alterações' : 'Adicionar'}</button>
+   ${editing ? '<button type="button" id="cancelar" class="border border-steel/40 px-5 py-2 rounded-md">Cancelar edição</button>' : ''}</div>`;
+  const c = $('cancelar'); if (c) c.onclick = () => { editing = null; renderForm(); };
+}
+
+async function upload(file) {
+  const path = `${tab}/${Date.now()}-${file.name.replace(/[^\w.-]/g, '_')}`;
+  const { error } = await sb.storage.from('liga').upload(path, file);
+  if (error) throw error;
+  return sb.storage.from('liga').getPublicUrl(path).data.publicUrl;
+}
+
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, data = {};
+  $('status').textContent = 'Salvando…';
+  try {
+    for (const f of SCHEMA[tab].fields) {
+      const el = form.elements[f.k];
+      if (f.t === 'checkbox') data[f.k] = el.checked;
+      else if (f.t === 'file') data[f.k] = el.files[0] ? await upload(el.files[0]) : (editing?.[f.k] ?? null);
+      else if (f.t === 'number') data[f.k] = Number(el.value) || 0;
+      else data[f.k] = el.value;
+    }
+    const q = editing ? sb.from(tab).update(data).eq('id', editing.id) : sb.from(tab).insert(data);
+    const { error } = await q;
+    if (error) throw error;
+    $('status').textContent = editing ? 'Alterações salvas.' : 'Item adicionado.';
+    editing = null; renderForm(); loadList();
+  } catch (err) { $('status').textContent = 'Erro ao salvar: ' + (err.message || err); }
+});
+
+async function loadList() {
+  const s = SCHEMA[tab];
+  const { data, error } = await sb.from(tab).select('*').order(s.order[0], { ascending: s.order[1] });
+  if (error) { $('lista').innerHTML = `<li class="p-4 text-sm">Erro ao carregar: ${esc(error.message)}</li>`; return; }
+  rows = data;
+  $('lista').innerHTML = rows.length ? rows.map(r => `
+    <li class="flex items-center justify-between gap-3 px-5 py-3">
+      <span>${esc(r[s.title])}${r.event_date ? ` <span class="text-sm text-steel">· ${esc(r.event_date)}</span>` : ''}</span>
+      <span class="flex gap-2 shrink-0">
+        <button data-edit="${r.id}" class="text-sm border border-steel/40 px-3 py-1 rounded-md hover:bg-navy">Editar</button>
+        <button data-del="${r.id}" class="text-sm border border-steel/40 px-3 py-1 rounded-md hover:bg-chip">Excluir</button>
+      </span></li>`).join('')
+    : '<li class="p-5 text-sm text-steel">Nada cadastrado ainda. Use o formulário acima para adicionar o primeiro item.</li>';
+}
+$('lista').addEventListener('click', async e => {
+  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
+  if (ed) { editing = rows.find(r => r.id === ed.dataset.edit); renderForm(); scrollTo({ top: 0, behavior: 'smooth' }); }
+  if (del && confirm('Excluir este item? Isso não pode ser desfeito.')) {
+    const { error } = await sb.from(tab).delete().eq('id', del.dataset.del);
+    $('status').textContent = error ? 'Erro ao excluir: ' + error.message : 'Item excluído.';
+    loadList();
+  }
+});
+
+sb.auth.getSession().then(({ data }) => show(!!data.session));
+</script>
+</body>
+</html>
