@@ -1,48 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LARC UFPE – Liga Acadêmica de Robótica e Controle</title>
 <meta name="description" content="Liga Acadêmica de Robótica e Controle: estudo, pesquisa e prática em robótica, sistemas de controle e automação.">
-
-
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="logo" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="48" fill="#fff" stroke="#202020" stroke-width="2.5" />
-    <g fill="#202020">
-      <rect x="34" y="17" width="4" height="9" rx="2" /><rect x="42" y="17" width="4" height="9" rx="2" /><rect x="50" y="17" width="4" height="9" rx="2" /><rect x="58" y="17" width="4" height="9" rx="2" />
-      <rect x="34" y="74" width="4" height="9" rx="2" /><rect x="42" y="74" width="4" height="9" rx="2" /><rect x="50" y="74" width="4" height="9" rx="2" /><rect x="58" y="74" width="4" height="9" rx="2" />
-      <rect x="17" y="36" width="9" height="4" rx="2" /><rect x="17" y="46" width="9" height="4" rx="2" /><rect x="17" y="56" width="9" height="4" rx="2" />
-      <rect x="74" y="36" width="9" height="4" rx="2" /><rect x="74" y="46" width="9" height="4" rx="2" /><rect x="74" y="56" width="9" height="4" rx="2" />
-    </g>
-    <rect x="27" y="27" width="46" height="46" rx="3" fill="#052865" />
-    <polygon points="27,50 42,50 56,36 73,36 73,46 60,46 46,60 27,60" fill="#36677f" />
-    <g stroke="#fff" stroke-width="2" fill="#052865" stroke-linecap="round">
-      <path d="M39 33v8M60 36l-4 0M44 60l-6 8M66 66v-6" fill="none" />
-      <circle cx="39" cy="43" r="3" /><circle cx="64" cy="34" r="3" /><circle cx="37" cy="64" r="3" /><circle cx="62" cy="62" r="3" />
-    </g>
-  </symbol>
-</svg>
-
-<figure class="bg-navy border border-steel/20 rounded-xl p-4">
-  <svg id="arm" viewBox="0 0 400 300" class="w-full h-auto" role="img" aria-label="Braço robótico que segue o cursor">
-    <line x1="40" y1="260" x2="360" y2="260" stroke="#a4bdd3" stroke-opacity=".4"/>
-    <rect x="170" y="250" width="60" height="12" fill="#052865" stroke="#a4bdd3"/>
-    <line id="l1" x1="200" y1="250" x2="200" y2="150" stroke="#a4bdd3" stroke-width="10" stroke-linecap="round"/>
-    <line id="l2" x1="200" y1="150" x2="200" y2="60" stroke="#7fb0cc" stroke-width="8" stroke-linecap="round"/>
-    <circle cx="200" cy="250" r="9" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
-    <circle id="j" cx="200" cy="150" r="8" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
-    <circle id="ef" cx="200" cy="60" r="7" fill="#ffffff"/>
-  </svg>
-  <figcaption class="text-sm text-steel mt-2">Mova o cursor sobre o desenho: o braço resolve a cinemática inversa em tempo real.</figcaption>
-</figure>
-
-
-<h3 class="font-display font-bold text-xl text-white mt-14">Direção atual</h3>
-<div id="lista-equipe" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-5">
-  <!-- Dinâmico via Supabase ou estático padrão -->
-</div>
 
 <!-- Fontes e Tailwind (CDN). Para produção, compile o Tailwind com a CLI. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50,7 +12,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   // Paleta do logotipo: azul marinho #052865, azul-aço #36677f e azul-gelo #a4bdd3
-  // ink = marinho mais escuro (fundo); accent = tom claro do azul-aço (destaques)
   tailwind.config = {
     theme: { extend: {
       colors: { ink:'#031a3d', navy:'#052865', steel:'#a4bdd3', accent:'#7fb0cc', chip:'#36677f' },
@@ -59,11 +20,9 @@
   }
 </script>
 <style>
-  html { scroll-padding-top: 5rem; }
-  /* Grade de engenharia no fundo do hero */
   .grid-bg { background-image: linear-gradient(rgba(164,189,211,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(164,189,211,.08) 1px,transparent 1px); background-size: 32px 32px; }
   :focus-visible { outline: 2px solid #7fb0cc; outline-offset: 3px; }
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 
@@ -88,161 +47,128 @@
   </symbol>
 </svg>
 
-<!-- ============ 1. NAVBAR FIXA ============ -->
+<!-- ============ NAVBAR FIXA ============ -->
+<!-- Os links usam "#/nome": o app.js mostra a seção correspondente (sem recarregar a página) -->
 <header class="fixed top-0 inset-x-0 z-50 bg-ink/90 backdrop-blur border-b border-steel/20">
   <nav class="max-w-6xl mx-auto flex items-center justify-between px-5 h-16" aria-label="Principal">
-    <a href="#inicio" class="flex items-center gap-2 font-display font-bold text-lg text-white">
+    <a href="#/" class="flex items-center gap-2 font-display font-bold text-lg text-white">
       <svg width="38" height="38" aria-hidden="true"><use href="#logo"/></svg>
       LARC UFPE
     </a>
-    <ul id="menu" class="hidden md:flex items-center gap-7 text-sm">
-      <li><a class="hover:text-accent" href="#inicio">Início</a></li>
-      <li><a class="hover:text-accent" href="#sobre">Sobre</a></li>
-      <li><a class="hover:text-accent" href="#projetos">Atividades e Projetos</a></li>
-      <li><a class="hover:text-accent" href="#selecao">Processo Seletivo</a></li>
-      <li><a class="hover:text-accent" href="#documentos">Documentos</a></li>
-      <li><a class="hover:text-accent" href="#eventos">Calendário</a></li>
+    <ul class="hidden md:flex items-center gap-8 text-sm">
+      <li><a data-nav="projetos" class="text-steel hover:text-white" href="#/projetos">Atividades e Projetos</a></li>
+      <li><a data-nav="selecao" class="text-steel hover:text-white" href="#/selecao">Processo Seletivo</a></li>
+      <li><a data-nav="documentos" class="text-steel hover:text-white" href="#/documentos">Documentos</a></li>
+      <li><a data-nav="eventos" class="text-steel hover:text-white" href="#/eventos">Eventos</a></li>
     </ul>
     <button id="burger" class="md:hidden p-2" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-mobile">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
   </nav>
-  <!-- Menu mobile -->
-  <ul id="menu-mobile" class="hidden md:hidden flex-col px-5 pb-4 gap-3 text-sm border-t border-steel/20 pt-3">
-    <li><a href="#inicio">Início</a></li>
-    <li><a href="#sobre">Sobre</a></li>
-    <li><a href="#projetos">Atividades e Projetos</a></li>
-    <li><a href="#selecao">Processo Seletivo</a></li>
-    <li><a href="#documentos">Documentos</a></li>
-    <li><a href="#eventos">Calendário</a></li>
+  <ul id="menu-mobile" class="hidden flex-col px-5 pb-4 gap-3 text-sm border-t border-steel/20 pt-3">
+    <li><a data-nav="projetos" class="text-steel" href="#/projetos">Atividades e Projetos</a></li>
+    <li><a data-nav="selecao" class="text-steel" href="#/selecao">Processo Seletivo</a></li>
+    <li><a data-nav="documentos" class="text-steel" href="#/documentos">Documentos</a></li>
+    <li><a data-nav="eventos" class="text-steel" href="#/eventos">Eventos</a></li>
   </ul>
 </header>
 
 <main>
-<!-- ============ 2. HERO ============ -->
-<section id="inicio" class="grid-bg pt-32 pb-20 px-5">
-  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-    <div>
-      <h1 class="font-display font-bold text-4xl sm:text-5xl lg:text-6xl text-white leading-tight">
-        Robótica e controle, do cálculo à bancada.
-      </h1>
-      <p class="mt-6 text-lg text-steel max-w-xl">
-        A LARC UFPE reúne estudantes para estudar, pesquisar e construir sistemas de robótica, controle e automação — com projetos reais e mentoria entre veteranos e calouros.
-      </p>
-      <div class="mt-8 flex flex-wrap gap-3">
-        <a href="#projetos" class="bg-white text-navy font-semibold px-6 py-3 rounded-md hover:bg-steel transition">Conheça nossos projetos</a>
-        <a href="#selecao" class="border border-steel text-white font-semibold px-6 py-3 rounded-md hover:bg-chip transition">Inscreva-se no Processo Seletivo</a>
+
+<!-- ============ VIEW: INÍCIO (apenas informações introdutórias) ============ -->
+<div data-view="home">
+  <section class="grid-bg pt-32 pb-20 px-5">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="font-display font-bold text-4xl sm:text-5xl lg:text-6xl text-white leading-tight">
+          Robótica e controle, do cálculo à bancada.
+        </h1>
+        <p class="mt-6 text-lg text-steel max-w-xl">
+          A LARC UFPE reúne estudantes para estudar, pesquisar e construir sistemas de robótica, controle e automação — com projetos reais e mentoria entre veteranos e calouros.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="#/projetos" class="bg-white text-navy font-semibold px-6 py-3 rounded-md hover:bg-steel transition">Conheça nossos projetos</a>
+          <a href="#/selecao" class="border border-steel text-white font-semibold px-6 py-3 rounded-md hover:bg-chip transition">Inscreva-se no Processo Seletivo</a>
+        </div>
+      </div>
+
+      <!-- Braço robótico interativo: segue o cursor (cinemática inversa de 2 elos) -->
+      <figure class="bg-navy border border-steel/20 rounded-xl p-4">
+        <svg id="arm" viewBox="0 0 400 300" class="w-full h-auto" role="img" aria-label="Braço robótico que segue o cursor">
+          <line x1="40" y1="260" x2="360" y2="260" stroke="#a4bdd3" stroke-opacity=".4"/>
+          <rect x="170" y="250" width="60" height="12" fill="#052865" stroke="#a4bdd3"/>
+          <line id="l1" x1="200" y1="250" x2="200" y2="150" stroke="#a4bdd3" stroke-width="10" stroke-linecap="round"/>
+          <line id="l2" x1="200" y1="150" x2="200" y2="60" stroke="#7fb0cc" stroke-width="8" stroke-linecap="round"/>
+          <circle cx="200" cy="250" r="9" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
+          <circle id="j" cx="200" cy="150" r="8" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
+          <circle id="ef" cx="200" cy="60" r="7" fill="#ffffff"/>
+        </svg>
+        <figcaption class="text-sm text-steel mt-2">Mova o cursor sobre o desenho: o braço resolve a cinemática inversa em tempo real.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="py-20 px-5 bg-navy">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="font-display font-bold text-3xl text-white">Sobre Nós</h2>
+      <div class="mt-6 grid md:grid-cols-2 gap-10">
+        <div class="space-y-4 text-steel">
+          <p>Nossa Liga Acadêmica é uma organização estudantil sem fins lucrativos dedicada ao aprofundamento do conhecimento científico e à formação complementar de estudantes universitários. Promovemos atividades de ensino, pesquisa e extensão que vão além da grade curricular tradicional.</p>
+          <p>Nosso objetivo é democratizar os estudos em engenharia de controle e robótica para solucionar problemas cotidianos da sociedade. Na condição de Liga Acadêmica, conseguimos realizar vários tipos de projetos que visam esse objetivo, são exemplos deles <strong class="text-white underline">Mostras Científicas</strong>, <strong class="text-white underline">Minicursos</strong> e <strong class="text-white underline">treinamentos</strong>.</p>
+        </div>
+        <dl class="grid sm:grid-cols-3 md:grid-cols-1 gap-4">
+          <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Missão</dt><dd class="text-steel text-sm">Democratizar o estudo da engenharia de controle e da robótica, promovendo ensino, pesquisa e extensão que complementem a formação universitária e ajudem a resolver problemas cotidianos da sociedade.</dd></div>
+          <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Visão</dt><dd class="text-steel text-sm">Ser reconhecida como uma liga acadêmica de referência em robótica e controle, formando estudantes preparados para a ciência, a tecnologia e o mercado.</dd></div>
+          <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Valores</dt><dd class="text-steel text-sm">Compromisso com o conhecimento científico, acesso aberto ao aprendizado, trabalho em equipe, responsabilidade social e ética acadêmica.</dd></div>
+        </dl>
+      </div>
+
+      <h3 class="font-display font-bold text-xl text-white mt-14">Direção atual</h3>
+      <div id="lista-equipe" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do presidente"><p class="mt-2 font-semibold text-white">João Paulo</p><p class="text-sm text-steel">Presidente</p></div>
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto da vice-presidente"><p class="mt-2 font-semibold text-white">Karízia Abzaik</p><p class="text-sm text-steel">Vice-presidente</p></div>
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do Secretário"><p class="mt-2 font-semibold text-white">João Henrique</p><p class="text-sm text-steel">Secretário</p></div>
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de extensão"><p class="mt-2 font-semibold text-white">João Marcos</p><p class="text-sm text-steel">Diretor de extensão</p></div>
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de pesquisa"><p class="mt-2 font-semibold text-white">Henry</p><p class="text-sm text-steel">Diretor de pesquisa</p></div>
+        <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de marketing"><p class="mt-2 font-semibold text-white">Rafael</p><p class="text-sm text-steel">Diretor de marketing</p></div>
       </div>
     </div>
+  </section>
+</div>
 
-    <!-- Braço robótico interativo: segue o cursor (cinemática inversa de 2 elos) -->
-    <figure class="bg-navy border border-steel/20 rounded-xl p-4">
-      <svg id="arm" viewBox="0 0 400 300" class="w-full h-auto" role="img" aria-label="Braço robótico que segue o cursor">
-        <line x1="40" y1="260" x2="360" y2="260" stroke="#a4bdd3" stroke-opacity=".4"/>
-        <rect x="170" y="250" width="60" height="12" fill="#052865" stroke="#a4bdd3"/>
-        <line id="l1" x1="200" y1="250" x2="200" y2="150" stroke="#a4bdd3" stroke-width="10" stroke-linecap="round"/>
-        <line id="l2" x1="200" y1="150" x2="200" y2="60" stroke="#7fb0cc" stroke-width="8" stroke-linecap="round"/>
-        <circle cx="200" cy="250" r="9" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
-        <circle id="j" cx="200" cy="150" r="8" fill="#031a3d" stroke="#7fb0cc" stroke-width="2"/>
-        <circle id="ef" cx="200" cy="60" r="7" fill="#ffffff"/>
-      </svg>
-      <figcaption class="text-sm text-steel mt-2">Mova o cursor sobre o desenho: o braço resolve a cinemática inversa em tempo real.</figcaption>
-    </figure>
-  </div>
-</section>
-
-<!-- ============ 3. SOBRE ============ -->
-<section id="sobre" class="py-20 px-5 bg-navy">
+<!-- ============ VIEW: ATIVIDADES E PROJETOS (abas + pastinhas) ============ -->
+<!-- As abas e os cards são montados pelo app.js (dados do Supabase ou exemplos) -->
+<section data-view="projetos" hidden class="pt-28 pb-20 px-5 min-h-[70vh]">
   <div class="max-w-6xl mx-auto">
-    <h2 class="font-display font-bold text-3xl text-white">Sobre Nós</h2>
-    <div class="mt-6 grid md:grid-cols-2 gap-10">
-      <div class="space-y-4 text-steel">
-        <p>Nossa Liga Acadêmica é uma organização estudantil sem fins lucrativos dedicada ao aprofundamento do conhecimento científico e à formação complementar de estudantes universitários. Promovemos atividades de ensino, pesquisa e extensão que vão além da grade curricular tradicional.</p>
-        <p>Nosso objetivo é democratizar os estudos em engenharia de controle e robótica para solucionar problemas cotidianos da sociedade. Na condição de Liga Acadêmica, conseguimos realizar vários tipos de projetos que visam esse objetivo, são exemplos deles <strong class="text-white underline">Mostras Científicas</strong>, <strong class="text-white underline">Minicursos</strong> e <strong class="text-white underline">treinamentos</strong>.</p>
-      </div>
-      <dl class="grid sm:grid-cols-3 md:grid-cols-1 gap-4">
-        <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Missão</dt><dd class="text-steel text-sm">Democratizar o estudo da engenharia de controle e da robótica, promovendo ensino, pesquisa e extensão que complementem a formação universitária e ajudem a resolver problemas cotidianos da sociedade.</dd></div>
-        <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Visão</dt><dd class="text-steel text-sm">Ser reconhecida como uma liga acadêmica de referência em robótica e controle, formando estudantes preparados para a ciência, a tecnologia e o mercado.</dd></div>
-        <div class="border-l-2 border-accent pl-4"><dt class="font-display text-white font-bold">Valores</dt><dd class="text-steel text-sm">Compromisso com o conhecimento científico, acesso aberto ao aprendizado, trabalho em equipe, responsabilidade social e ética acadêmica.</dd></div>
-      </dl>
-    </div>
-
-    <h3 class="font-display font-bold text-xl text-white mt-14">Direção atual</h3>
-    <div id="lista-equipe" class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-5">
-      <!-- Repita o bloco para cada membro -->
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do presidente"><p class="mt-2 font-semibold text-white">João Paulo</p><p class="text-sm text-steel">Presidente</p></div>
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto da vice-presidente"><p class="mt-2 font-semibold text-white">Karízia Abzaik</p><p class="text-sm text-steel">Vice-presidente</p></div>
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do Secretário"><p class="mt-2 font-semibold text-white">João Henrique</p><p class="text-sm text-steel">Secretário</p></div>
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de extensão"><p class="mt-2 font-semibold text-white">João Marcos</p><p class="text-sm text-steel">Diretor de extensão</p></div>
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de pesquisa"><p class="mt-2 font-semibold text-white">Henry</p><p class="text-sm text-steel">Diretor de pesquisa</p></div>
-      <div><img class="rounded-lg w-full aspect-square object-cover" src="https://placehold.co/300x300/36677f/ffffff?text=Foto" alt="Foto do diretor de marketing"><p class="mt-2 font-semibold text-white">Rafael</p><p class="text-sm text-steel">Diretor de marketing</p></div>
-    </div>
+    <h1 class="font-display font-bold text-3xl text-white">Atividades e projetos</h1>
+    <p class="mt-3 text-steel max-w-2xl">Escolha uma categoria e abra a pasta para ver fotos, materiais e links de cada atividade.</p>
+    <nav id="abas-projetos" class="mt-6 flex flex-wrap gap-2" aria-label="Categorias"></nav>
+    <div id="lista-projetos" class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-9"></div>
   </div>
 </section>
 
-<!-- ============ 4. ATIVIDADES E PROJETOS ============ -->
-<section id="projetos" class="py-20 px-5">
-  <div class="max-w-6xl mx-auto">
-    <h2 class="font-display font-bold text-3xl text-white">Atividades e projetos</h2>
-    <p class="mt-3 text-steel max-w-2xl">Filtre por área e veja o que estamos construindo.</p>
-
-    <!-- Filtros interativos -->
-    <div id="filtros" class="mt-6 flex flex-wrap gap-2" role="group" aria-label="Filtrar projetos">
-      <button data-f="todos" class="f px-4 py-1.5 rounded-full text-sm border border-white bg-white text-navy">Todos</button>
-      <button data-f="robotica" class="f px-4 py-1.5 rounded-full text-sm border border-steel/40">Robótica</button>
-      <button data-f="controle" class="f px-4 py-1.5 rounded-full text-sm border border-steel/40">Controle</button>
-      <button data-f="automacao" class="f px-4 py-1.5 rounded-full text-sm border border-steel/40">Automação</button>
-    </div>
-
-    <div id="lista-projetos" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Para adicionar projeto: copie um <article> e ajuste data-cat -->
-      <article data-cat="robotica" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Braço+robótico" alt="Braço robótico de 4 eixos" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Braço robótico de 4 eixos</h3><p class="mt-2 text-sm text-steel">Manipulador com servomotores, cinemática inversa e controle por ROS.</p></div>
-      </article>
-      <article data-cat="controle" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Seguidor+de+linha" alt="Robô seguidor de linha" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Seguidor de linha</h3><p class="mt-2 text-sm text-steel">Controle PID sintonizado para competições, com sensores infravermelhos.</p></div>
-      </article>
-      <article data-cat="robotica" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Robô+móvel" alt="Robô móvel autônomo" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Robô móvel autônomo</h3><p class="mt-2 text-sm text-steel">Navegação com LIDAR, mapeamento (SLAM) e desvio de obstáculos.</p></div>
-      </article>
-      <article data-cat="automacao" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Automação+residencial" alt="Automação residencial" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Automação residencial</h3><p class="mt-2 text-sm text-steel">Iluminação e tomadas controladas por ESP32 e protocolo MQTT.</p></div>
-      </article>
-      <article data-cat="automacao" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Rastreador+solar" alt="Rastreador solar" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Rastreador solar</h3><p class="mt-2 text-sm text-steel">Painel que acompanha o sol em dois eixos para aumentar a geração.</p></div>
-      </article>
-      <article data-cat="controle" class="proj bg-navy rounded-xl overflow-hidden border border-steel/20">
-        <img src="https://placehold.co/600x360/36677f/ffffff?text=Pêndulo+invertido" alt="Pêndulo invertido" class="w-full h-44 object-cover">
-        <div class="p-5"><h3 class="font-display font-bold text-white">Pêndulo invertido</h3><p class="mt-2 text-sm text-steel">Planta didática para controle em espaço de estados (LQR).</p></div>
-      </article>
-    </div>
-  </div>
+<!-- ============ VIEW: DETALHE DO PROJETO/EVENTO (montado pelo app.js) ============ -->
+<section data-view="projeto" hidden class="pt-28 pb-20 px-5 min-h-[70vh]">
+  <div id="detalhe" class="max-w-5xl mx-auto"></div>
 </section>
 
-<!-- ============ 5. PROCESSO SELETIVO ============ -->
-<section id="selecao" class="py-20 px-5 bg-navy">
+<!-- ============ VIEW: PROCESSO SELETIVO ============ -->
+<section data-view="selecao" hidden class="pt-28 pb-20 px-5 min-h-[70vh]">
   <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
     <div>
-      <h2 class="font-display font-bold text-3xl text-white">Processo seletivo</h2>
+      <h1 class="font-display font-bold text-3xl text-white">Processo seletivo</h1>
       <p class="mt-3 text-steel">Abrimos vagas a cada semestre para estudantes de qualquer curso. Não exigimos experiência prévia.</p>
-      <h3 class="font-display font-bold text-white mt-8">Requisitos</h3>
+      <h2 class="font-display font-bold text-white mt-8">Requisitos</h2>
       <ul class="mt-3 space-y-2 text-steel list-disc pl-5">
         <li>Matrícula ativa em curso de graduação.</li>
         <li>Disponibilidade de 6 horas semanais.</li>
         <li>Interesse em aprender e trabalhar em equipe.</li>
       </ul>
+      <!-- Troque o link pelo seu Google Forms ou Typeform -->
       <a href="https://forms.gle/SEU-LINK" target="_blank" rel="noopener" class="inline-block mt-8 bg-white text-navy font-semibold px-6 py-3 rounded-md hover:bg-steel transition">Preencher inscrição</a>
-      <p class="mt-2 text-sm text-steel">Troque o link pelo seu Google Forms ou Typeform.</p>
     </div>
-
-    <!-- Etapas: aqui a numeração faz sentido, é uma sequência -->
     <div>
-      <h3 class="font-display font-bold text-white">Etapas do edital</h3>
+      <h2 class="font-display font-bold text-white">Etapas do edital</h2>
       <ol class="mt-4 space-y-5 border-l border-steel/30 pl-6">
         <li class="relative"><span class="absolute -left-[34px] top-0 w-6 h-6 rounded-full bg-white text-navy text-xs font-bold grid place-items-center">1</span><p class="font-semibold text-white">Inscrição</p><p class="text-sm text-steel">Formulário online com dados e motivação.</p></li>
         <li class="relative"><span class="absolute -left-[34px] top-0 w-6 h-6 rounded-full bg-white text-navy text-xs font-bold grid place-items-center">2</span><p class="font-semibold text-white">Oficina prática</p><p class="text-sm text-steel">Montagem de um circuito simples em grupo.</p></li>
@@ -253,10 +179,10 @@
   </div>
 </section>
 
-<!-- ============ 6. DOCUMENTOS ============ -->
-<section id="documentos" class="py-20 px-5">
+<!-- ============ VIEW: DOCUMENTOS ============ -->
+<section data-view="documentos" hidden class="pt-28 pb-20 px-5 min-h-[70vh]">
   <div class="max-w-4xl mx-auto">
-    <h2 class="font-display font-bold text-3xl text-white">Documentos úteis</h2>
+    <h1 class="font-display font-bold text-3xl text-white">Documentos úteis</h1>
     <ul id="lista-documentos" class="mt-8 divide-y divide-steel/20 border border-steel/20 rounded-xl overflow-hidden">
       <!-- Coloque os PDFs na pasta /docs e ajuste os href -->
       <li><a href="docs/estatuto.pdf" download class="flex justify-between items-center px-5 py-4 hover:bg-navy"><span>Estatuto da liga</span><span class="text-sm text-accent">PDF</span></a></li>
@@ -268,34 +194,40 @@
   </div>
 </section>
 
-<!-- ============ 7. CALENDÁRIO E EVENTOS ============ -->
-<section id="eventos" class="py-20 px-5 bg-navy">
+<!-- ============ VIEW: EVENTOS ============ -->
+<section data-view="eventos" hidden class="pt-28 pb-20 px-5 min-h-[70vh]">
   <div class="max-w-4xl mx-auto">
-    <h2 class="font-display font-bold text-3xl text-white">Calendário e eventos</h2>
+    <h1 class="font-display font-bold text-3xl text-white">Calendário e eventos</h1>
     <ol id="lista-eventos" class="mt-8 space-y-4">
-      <!-- Edite datas e títulos. Borda branca = prazo; demais = evento -->
-      <li class="flex gap-5 bg-ink/60 border border-steel/20 rounded-xl p-4">
+      <!-- Borda branca = prazo; demais = evento -->
+      <li class="flex gap-5 bg-navy border border-steel/20 rounded-xl p-4">
         <div class="w-16 text-center shrink-0"><p class="font-display text-2xl font-bold text-accent">15</p><p class="text-xs text-steel">mar</p></div>
         <div><p class="font-semibold text-white">Workshop: introdução ao Arduino e ESP32</p><p class="text-sm text-steel">14h, Laboratório de Controle</p></div>
       </li>
-      <li class="flex gap-5 bg-ink/60 border border-steel/20 rounded-xl p-4">
+      <li class="flex gap-5 bg-navy border border-steel/20 rounded-xl p-4">
         <div class="w-16 text-center shrink-0"><p class="font-display text-2xl font-bold text-accent">28</p><p class="text-xs text-steel">mar</p></div>
         <div><p class="font-semibold text-white">Palestra: robótica móvel na indústria</p><p class="text-sm text-steel">19h, Auditório do CTG</p></div>
       </li>
-      <li class="flex gap-5 bg-ink/60 border border-white/50 rounded-xl p-4">
+      <li class="flex gap-5 bg-navy border border-white/50 rounded-xl p-4">
         <div class="w-16 text-center shrink-0"><p class="font-display text-2xl font-bold text-white">05</p><p class="text-xs text-steel">abr</p></div>
         <div><p class="font-semibold text-white">Prazo final de inscrição no processo seletivo</p><p class="text-sm text-steel">Até 23h59</p></div>
       </li>
-      <li class="flex gap-5 bg-ink/60 border border-steel/20 rounded-xl p-4">
+      <li class="flex gap-5 bg-navy border border-steel/20 rounded-xl p-4">
         <div class="w-16 text-center shrink-0"><p class="font-display text-2xl font-bold text-accent">12</p><p class="text-xs text-steel">abr</p></div>
         <div><p class="font-semibold text-white">Reunião aberta para novos interessados</p><p class="text-sm text-steel">16h, Sala da liga</p></div>
       </li>
     </ol>
   </div>
 </section>
+
 </main>
 
-<!-- ============ 8. RODAPÉ ============ -->
+<!-- Visualizador ampliado das fotos da galeria (controlado pelo app.js) -->
+<div id="lightbox" class="hidden fixed inset-0 z-[60] bg-ink/95 p-4 cursor-zoom-out items-center justify-center" role="dialog" aria-label="Foto ampliada">
+  <img alt="" class="max-h-full max-w-full rounded-lg">
+</div>
+
+<!-- ============ RODAPÉ ============ -->
 <footer class="py-12 px-5 border-t border-steel/20">
   <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between gap-6">
     <div>
@@ -313,37 +245,23 @@
 </footer>
 
 <script>
-  // Menu mobile
-  const burger = document.getElementById('burger'), mm = document.getElementById('menu-mobile');
-  burger.addEventListener('click', () => {
-    const open = mm.classList.toggle('hidden') === false;
-    mm.classList.toggle('flex', open);
-    burger.setAttribute('aria-expanded', open);
-  });
-  mm.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { mm.classList.add('hidden'); mm.classList.remove('flex'); }));
+  const $ = id => document.getElementById(id);
 
-  // Filtro de projetos
-  document.querySelectorAll('.f').forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('.f').forEach(b => { b.classList.remove('bg-white','text-navy','border-white'); b.classList.add('border-steel/40'); });
-    btn.classList.add('bg-white','text-navy','border-white');
-    document.querySelectorAll('.proj').forEach(p => p.classList.toggle('hidden', btn.dataset.f !== 'todos' && p.dataset.cat !== btn.dataset.f));
-  }));
+  // Menu mobile (fecha ao navegar)
+  const burger = $('burger'), mm = $('menu-mobile');
+  function setMenu(open) { mm.classList.toggle('hidden', !open); mm.classList.toggle('flex', open); burger.setAttribute('aria-expanded', open); }
+  burger.addEventListener('click', () => setMenu(mm.classList.contains('hidden')));
+  addEventListener('hashchange', () => setMenu(false));
 
   // Braço robótico: cinemática inversa de 2 elos (base em 200,250; elos de 100 e 90)
-  const svg = document.getElementById('arm'), L1 = 100, L2 = 90, bx = 200, by = 250;
-  const $ = id => document.getElementById(id);
+  const svg = $('arm'), L1 = 100, L2 = 90, bx = 200, by = 250;
   function solve(tx, ty) {
-    let dx = tx - bx, dy = ty - by, d = Math.min(Math.hypot(dx, dy), L1 + L2 - 1);
-    const a = Math.atan2(dy, dx);
-    const c = Math.acos((L1*L1 + d*d - L2*L2) / (2*L1*d));
-    const t1 = a - c; // cotovelo para cima
-    const jx = bx + L1*Math.cos(t1), jy = by + L1*Math.sin(t1);
-    const ex = bx + d*Math.cos(a), ey = by + d*Math.sin(a);
+    const dx = tx - bx, dy = ty - by, d = Math.min(Math.hypot(dx, dy), L1 + L2 - 1);
+    const a = Math.atan2(dy, dx), c = Math.acos((L1*L1 + d*d - L2*L2) / (2*L1*d)), t1 = a - c;
+    const jx = bx + L1*Math.cos(t1), jy = by + L1*Math.sin(t1), ex = bx + d*Math.cos(a), ey = by + d*Math.sin(a);
     $('l1').setAttribute('x2', jx); $('l1').setAttribute('y2', jy);
-    $('l2').setAttribute('x1', jx); $('l2').setAttribute('y1', jy);
-    $('l2').setAttribute('x2', ex); $('l2').setAttribute('y2', ey);
-    $('j').setAttribute('cx', jx); $('j').setAttribute('cy', jy);
-    $('ef').setAttribute('cx', ex); $('ef').setAttribute('cy', ey);
+    $('l2').setAttribute('x1', jx); $('l2').setAttribute('y1', jy); $('l2').setAttribute('x2', ex); $('l2').setAttribute('y2', ey);
+    $('j').setAttribute('cx', jx); $('j').setAttribute('cy', jy); $('ef').setAttribute('cx', ex); $('ef').setAttribute('cy', ey);
   }
   solve(260, 90);
   svg.addEventListener('pointermove', e => {
@@ -351,10 +269,10 @@
     solve((e.clientX - r.left) * 400 / r.width, Math.min((e.clientY - r.top) * 300 / r.height, 245));
   });
 
-  // Ano no rodapé
-  document.getElementById('ano').textContent = new Date().getFullYear();
+  $('ano').textContent = new Date().getFullYear();
 </script>
-<!-- Dados dinâmicos (Supabase): preencha o config.js -->
+
+<!-- Supabase + rotas + dados dinâmicos (preencha o config.js) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.0/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>

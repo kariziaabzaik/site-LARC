@@ -58,10 +58,20 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 // (e a coluna correspondente no banco).
 const SCHEMA = {
   projects:  { label:'Projetos',   title:'title', order:['created_at',false], fields:[
-    {k:'title', l:'Título', t:'text', req:1},
-    {k:'category', l:'Categoria', t:'select', o:{robotica:'Robótica', controle:'Controle', automacao:'Automação'}},
-    {k:'description', l:'Descrição', t:'textarea', full:1},
-    {k:'image_url', l:'Imagem', t:'file', accept:'image/*'}]},
+    {k:'title', l:'Nome do evento/projeto', t:'text', req:1},
+    {k:'category', l:'Categoria', t:'select', o:{congresso:'Congressos', planta:'Plantas Didáticas', apresentacao:'Apresentações Internas'}},
+    {k:'description', l:'Explicação (o que foi o evento/projeto)', t:'textarea', full:1},
+    {k:'official_url', l:'Link da página oficial (site externo)', t:'url'},
+    {k:'image_url', l:'Imagem de capa do card', t:'file', accept:'image/*'}]},
+  project_photos: { label:'Fotos', title:'caption', order:['created_at',false], fields:[
+    {k:'project_id', l:'Projeto', t:'ref', req:1},
+    {k:'image_url', l:'Fotos (pode selecionar várias de uma vez)', t:'file', accept:'image/*', multiple:1, req:1},
+    {k:'caption', l:'Legenda (opcional)', t:'text'}]},
+  project_files: { label:'Arquivos', title:'title', order:['created_at',false], fields:[
+    {k:'project_id', l:'Projeto', t:'ref', req:1},
+    {k:'title', l:'Nome do arquivo', t:'text', req:1},
+    {k:'kind', l:'Tipo', t:'select', o:{banner:'Modelo de banner', slides:'Slides da apresentação', artigo:'Artigo', outro:'Outro documento'}},
+    {k:'file_url', l:'Arquivo', t:'file', accept:'.pdf,.ppt,.pptx,.doc,.docx,image/*', req:1}]},
   events:    { label:'Eventos',    title:'title', order:['event_date',true], fields:[
     {k:'title', l:'Título', t:'text', req:1},
     {k:'event_date', l:'Data', t:'date', req:1},
@@ -94,13 +104,20 @@ $('form-login').addEventListener('submit', async e => {
 $('sair').addEventListener('click', async () => { await sb.auth.signOut(); show(false); });
 
 // ---------- Abas, formulário e lista ----------
-function openTab(t) {
+let projOpts = [];
+const projName = id => (projOpts.find(p => p.id === id) || {}).title;
+async function loadRefs() {
+  if (!SCHEMA[tab].fields.some(f => f.t === 'ref')) return;
+  const { data } = await sb.from('projects').select('id,title').order('title');
+  projOpts = data || [];
+}
+async function openTab(t) {
   tab = t; editing = null;
   $('abas').innerHTML = Object.entries(SCHEMA).map(([k, s]) =>
     `<button data-tab="${k}" class="px-4 py-1.5 rounded-full text-sm border ${k === t ? 'bg-white text-navy border-white' : 'border-steel/40'}">${s.label}</button>`).join('');
   $('titulo').textContent = SCHEMA[t].label;
   $('status').textContent = '';
-  renderForm(); loadList();
+  await loadRefs(); renderForm(); loadList();
 }
 $('abas').addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) openTab(b.dataset.tab); });
 
@@ -112,8 +129,9 @@ function renderForm() {
     let el;
     if (f.t === 'textarea') el = `<textarea name="${f.k}" rows="3" class="${inputCls}">${esc(v[f.k])}</textarea>`;
     else if (f.t === 'select') el = `<select name="${f.k}" class="${inputCls}">${Object.entries(f.o).map(([k, n]) => `<option value="${k}" ${v[f.k] === k ? 'selected' : ''}>${n}</option>`).join('')}</select>`;
+    else if (f.t === 'ref') el = `<select name="${f.k}" required class="${inputCls}"><option value="">${projOpts.length ? 'Escolha o projeto…' : 'Cadastre um projeto primeiro'}</option>${projOpts.map(p => `<option value="${p.id}" ${v[f.k] === p.id ? 'selected' : ''}>${esc(p.title)}</option>`).join('')}</select>`;
     else if (f.t === 'checkbox') return `<label class="flex items-center gap-2 text-sm ${wrap}"><input type="checkbox" name="${f.k}" ${v[f.k] ? 'checked' : ''}> ${f.l}</label>`;
-    else if (f.t === 'file') el = `<input type="file" name="${f.k}" accept="${f.accept}" class="${inputCls}" ${f.req && !v[f.k] ? 'required' : ''}>${v[f.k] ? '<p class="text-xs text-steel mt-1">Já existe um arquivo. Envie outro só se quiser trocar.</p>' : ''}`;
+    else if (f.t === 'file') el = `<input type="file" name="${f.k}" accept="${f.accept}" ${f.multiple && !editing ? 'multiple' : ''} class="${inputCls}" ${f.req && !v[f.k] ? 'required' : ''}>${v[f.k] ? '<p class="text-xs text-steel mt-1">Já existe um arquivo. Envie outro só se quiser trocar.</p>' : ''}`;
     else el = `<input name="${f.k}" type="${f.t}" value="${esc(v[f.k])}" class="${inputCls}" ${f.req ? 'required' : ''}>`;
     return `<div class="${wrap}"><label class="block text-sm mb-1">${f.l}</label>${el}</div>`;
   }).join('') +
@@ -131,17 +149,21 @@ async function upload(file) {
 
 $('form').addEventListener('submit', async e => {
   e.preventDefault();
-  const form = e.target, data = {};
+  const form = e.target, data = {}; let extra = null;
   $('status').textContent = 'Salvando…';
   try {
     for (const f of SCHEMA[tab].fields) {
       const el = form.elements[f.k];
       if (f.t === 'checkbox') data[f.k] = el.checked;
-      else if (f.t === 'file') data[f.k] = el.files[0] ? await upload(el.files[0]) : (editing?.[f.k] ?? null);
+      else if (f.t === 'file') {
+        const fl = [...el.files];
+        if (f.multiple && !editing && fl.length > 1) { extra = { k: f.k, urls: await Promise.all(fl.map(x => upload(x))) }; data[f.k] = extra.urls[0]; }
+        else data[f.k] = fl[0] ? await upload(fl[0]) : (editing?.[f.k] ?? null);
+      }
       else if (f.t === 'number') data[f.k] = Number(el.value) || 0;
       else data[f.k] = el.value;
     }
-    const q = editing ? sb.from(tab).update(data).eq('id', editing.id) : sb.from(tab).insert(data);
+    const q = editing ? sb.from(tab).update(data).eq('id', editing.id) : sb.from(tab).insert(extra ? extra.urls.map(u => ({ ...data, [extra.k]: u })) : data);
     const { error } = await q;
     if (error) throw error;
     $('status').textContent = editing ? 'Alterações salvas.' : 'Item adicionado.';
@@ -156,7 +178,7 @@ async function loadList() {
   rows = data;
   $('lista').innerHTML = rows.length ? rows.map(r => `
     <li class="flex items-center justify-between gap-3 px-5 py-3">
-      <span>${esc(r[s.title])}${r.event_date ? ` <span class="text-sm text-steel">· ${esc(r.event_date)}</span>` : ''}</span>
+      <span>${esc(r[s.title] || 'Foto')}${projName(r.project_id) ? ` <span class="text-sm text-steel">· ${esc(projName(r.project_id))}</span>` : ''}${r.event_date ? ` <span class="text-sm text-steel">· ${esc(r.event_date)}</span>` : ''}</span>
       <span class="flex gap-2 shrink-0">
         <button data-edit="${r.id}" class="text-sm border border-steel/40 px-3 py-1 rounded-md hover:bg-navy">Editar</button>
         <button data-del="${r.id}" class="text-sm border border-steel/40 px-3 py-1 rounded-md hover:bg-chip">Excluir</button>
